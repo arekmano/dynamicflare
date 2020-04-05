@@ -74,7 +74,7 @@ func (s *DynamicFlare) listDomainRecords(id string) error {
 			WithField("id", domain.ID).
 			WithField("name", domain.Name).
 			WithField("content", domain.Content).
-			WithField("type", domain.RecordType).
+			WithField("type", domain.Type).
 			Info(i)
 	}
 	return nil
@@ -98,7 +98,7 @@ func (s *DynamicFlare) Run(dryRun bool, records []dns.Record) error {
 		entry.Info("IP is different from cached. Not updating (dry-run on)")
 		return nil
 	} else if ip != newIP {
-		entry.Info("IP is different from cached. Updating")
+		entry.Info("IP is different from cached. Updating Records")
 		return s.cloudflare.UpdateMany(records, newIP)
 	}
 	entry.Info("IP is the same as the cached one")

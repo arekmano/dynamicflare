@@ -15,11 +15,11 @@ var rootCmd = &cobra.Command{
 }
 
 var configFile string
-var isDryRun bool
+var verbose bool
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "the configuration file to use")
-	rootCmd.Flags().BoolVarP(&isDryRun, "dryrun", "d", false, "if set to true, will not update the cloudflare entry")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "if set to true, set the debug level to debug")
 	rootCmd.MarkFlagRequired("config")
 	rootCmd.AddCommand(updateCmd)
 	rootCmd.AddCommand(domainsCmd)

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -46,10 +45,11 @@ type Domain struct {
 }
 
 type Record struct {
-	ID         string `json:"id"`
-	RecordType string `json:"type"`
-	Name       string `json:"name"`
-	Content    string `json:"content"`
+	ID      string `json:"id"`
+	Type    string `json:"type"`
+	Name    string `json:"name"`
+	Content string `json:"content"`
+	ZoneID  string `json:"zone_id"`
 }
 
 type CloudflareConfig struct {
@@ -68,6 +68,12 @@ func NewCloudflareClient(config *CloudflareConfig) *CloudflareClient {
 
 func (c *CloudflareClient) UpdateMany(records []Record, newIP string) error {
 	for _, record := range records {
+		c.logger.
+			WithField("id", record.ID).
+			WithField("name", record.Name).
+			WithField("type", record.Type).
+			WithField("zone_id", record.ZoneID).
+			Debug("Updating record")
 		err := c.Update(record, newIP)
 		if err != nil {
 			return errors.Wrapf(err, "Error updating %s", record.Name)
@@ -77,19 +83,7 @@ func (c *CloudflareClient) UpdateMany(records []Record, newIP string) error {
 }
 
 func (c *CloudflareClient) Domains(id string) ([]Record, error) {
-	req, err := http.NewRequest("GET", "https://api.cloudflare.com/client/v4/zones/"+id+"/dns_records", strings.NewReader(""))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("X-Auth-Key", c.Key)
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("X-Auth-Email", c.Email)
-
-	resp, err := c.Client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := c.send("GET", "https://api.cloudflare.com/client/v4/zones/"+id+"/dns_records", []byte(""))
 	if err != nil {
 		return nil, err
 	}
@@ -105,19 +99,7 @@ func (c *CloudflareClient) Domains(id string) ([]Record, error) {
 }
 
 func (c *CloudflareClient) Zones() ([]Domain, error) {
-	req, err := http.NewRequest("GET", "https://api.cloudflare.com/client/v4/zones", strings.NewReader(""))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("X-Auth-Key", c.Key)
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("X-Auth-Email", c.Email)
-
-	resp, err := c.Client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := c.send("GET", "https://api.cloudflare.com/client/v4/zones", []byte(""))
 	if err != nil {
 		return nil, err
 	}
@@ -132,13 +114,8 @@ func (c *CloudflareClient) Zones() ([]Domain, error) {
 	}
 	return response.Result, err
 }
-
-func (c *CloudflareClient) send(record Record) (*http.Response, error) {
-	bodyBytes, err := json.Marshal(record)
-	if err != nil {
-		return nil, err
-	}
-	req, err := http.NewRequest("PUT", "https://api.cloudflare.com/client/v4/zones/2a1c86b70e031a2d3f1a45ce2bbfa544/dns_records/"+record.ID, bytes.NewBuffer(bodyBytes))
+func (c *CloudflareClient) send(verb, url string, body []byte) ([]byte, error) {
+	req, err := http.NewRequest(verb, url, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
@@ -147,25 +124,34 @@ func (c *CloudflareClient) send(record Record) (*http.Response, error) {
 	req.Header.Add("X-Auth-Email", c.Email)
 
 	c.logger.
-		WithField("name", record.Name).
-		WithField("type", record.RecordType).
-		WithField("new-ip", record.Content).
+		WithField("url", url).
+		WithField("verb", verb).
+		WithField("body", string(body)).
 		Debug("sending request to Cloudflare")
 
 	resp, err := c.Client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	return resp, err
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	c.logger.
+		WithField("status-code", resp.StatusCode).
+		WithField("body", string(responseBody)).
+		Debug("received response from Cloudflare")
+
+	return responseBody, nil
 }
 
 func (c *CloudflareClient) Update(record Record, newIP string) error {
 	record.Content = newIP
-	resp, err := c.send(record)
+	bodyBytes, err := json.Marshal(record)
 	if err != nil {
 		return err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := c.send("PUT", "https://api.cloudflare.com/client/v4/zones/"+record.ZoneID+"/dns_records/"+record.ID, bodyBytes)
 	if err != nil {
 		return err
 	}
@@ -182,8 +168,6 @@ func (c *CloudflareClient) Update(record Record, newIP string) error {
 		c.logger.
 			WithField("name", record.Name).
 			WithField("response", responseRecord).
-			WithField("status-code", resp.StatusCode).
-			WithField("status", resp.Status).
 			Error("Error Updating Cloudflare DNS record")
 	}
 	return nil
