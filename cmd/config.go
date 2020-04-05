@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"dynamicflare/service"
 	"fmt"
+
+	"github.com/arekmano/dynamicflare/service"
 
 	"github.com/spf13/viper"
 )

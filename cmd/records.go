@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"dynamicflare/service"
+	"github.com/arekmano/dynamicflare/service"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"dynamicflare/cmd"
+	"github.com/arekmano/dynamicflare/cmd"
 )
 
 func main() {

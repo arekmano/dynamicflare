@@ -1,4 +1,4 @@
-module dynamicflare
+module github.com/arekmano/dynamicflare
 
 go 1.14
 

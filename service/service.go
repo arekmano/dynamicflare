@@ -1,9 +1,9 @@
 package service
 
 import (
-	"dynamicflare/cache"
-	"dynamicflare/dns"
-	"dynamicflare/ip"
+	"github.com/arekmano/dynamicflare/cache"
+	"github.com/arekmano/dynamicflare/dns"
+	"github.com/arekmano/dynamicflare/ip"
 
 	"github.com/sirupsen/logrus"
 )
