@@ -26,7 +26,7 @@ func init() {
 	rootCmd.AddCommand(recordsCmd)
 }
 
-// Execute execute cmd
+// Execute executes the root cmd
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

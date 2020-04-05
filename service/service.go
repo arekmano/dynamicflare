@@ -65,16 +65,16 @@ func (s *DynamicFlare) ListDomainRecords() error {
 }
 
 func (s *DynamicFlare) listDomainRecords(id string) error {
-	domains, err := s.cloudflare.Domains(id)
+	records, err := s.cloudflare.Records(id)
 	if err != nil {
 		return err
 	}
-	for i, domain := range domains {
+	for i, record := range records {
 		logrus.
-			WithField("id", domain.ID).
-			WithField("name", domain.Name).
-			WithField("content", domain.Content).
-			WithField("type", domain.Type).
+			WithField("id", record.ID).
+			WithField("name", record.Name).
+			WithField("content", record.Content).
+			WithField("type", record.Type).
 			Info(i)
 	}
 	return nil

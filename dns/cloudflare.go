@@ -17,21 +17,21 @@ type CloudflareClient struct {
 	Email  string
 }
 
-type UpdateRecordResponse struct {
+type updateRecordResponse struct {
 	Result   Record                   `json:"result"`
 	Success  bool                     `json:"success"`
 	Errors   []map[string]interface{} `json:"errors"`
 	Messages []map[string]interface{} `json:"messages"`
 }
 
-type ListRecordsResponse struct {
+type listRecordsResponse struct {
 	Result   []Record                 `json:"result"`
 	Success  bool                     `json:"success"`
 	Errors   []map[string]interface{} `json:"errors"`
 	Messages []map[string]interface{} `json:"messages"`
 }
 
-type ListDomainsResponse struct {
+type listDomainsResponse struct {
 	Result   []Domain                 `json:"result"`
 	Success  bool                     `json:"success"`
 	Errors   []map[string]interface{} `json:"errors"`
@@ -44,6 +44,7 @@ type Domain struct {
 	Status string `json:"status"`
 }
 
+// Record represents a cloudflare DNS record
 type Record struct {
 	ID      string `json:"id"`
 	Type    string `json:"type"`
@@ -52,6 +53,7 @@ type Record struct {
 	ZoneID  string `json:"zone_id"`
 }
 
+// CloudflareConfig the configuration given to a CloudflareClient
 type CloudflareConfig struct {
 	Key   string
 	Email string
@@ -82,12 +84,13 @@ func (c *CloudflareClient) UpdateMany(records []Record, newIP string) error {
 	return nil
 }
 
-func (c *CloudflareClient) Domains(id string) ([]Record, error) {
+// Records returns the records associated with the given zone ID.
+func (c *CloudflareClient) Records(id string) ([]Record, error) {
 	body, err := c.send("GET", "https://api.cloudflare.com/client/v4/zones/"+id+"/dns_records", []byte(""))
 	if err != nil {
 		return nil, err
 	}
-	var response ListRecordsResponse
+	var response listRecordsResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
 		return nil, err
@@ -98,13 +101,14 @@ func (c *CloudflareClient) Domains(id string) ([]Record, error) {
 	return response.Result, err
 }
 
+// Zones returns the different zones that are available on Cloudflare.
 func (c *CloudflareClient) Zones() ([]Domain, error) {
 	body, err := c.send("GET", "https://api.cloudflare.com/client/v4/zones", []byte(""))
 	if err != nil {
 		return nil, err
 	}
 
-	var response ListDomainsResponse
+	var response listDomainsResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
 		return nil, err
@@ -155,7 +159,7 @@ func (c *CloudflareClient) Update(record Record, newIP string) error {
 	if err != nil {
 		return err
 	}
-	responseRecord := UpdateRecordResponse{}
+	responseRecord := updateRecordResponse{}
 	err = json.Unmarshal(body, &responseRecord)
 	if err != nil {
 		return err

@@ -10,7 +10,9 @@ import (
 )
 
 const (
-	AuthKeyVariableName   = "DYNAMICFLARE_AUTH_KEY"
+	// AuthKeyVariableName the environment variable name of the auth key for Cloudflare
+	AuthKeyVariableName = "DYNAMICFLARE_AUTH_KEY"
+	// AuthEmailVariableName the environment variable name of the auth email for Cloudflare
 	AuthEmailVariableName = "DYNAMICFLARE_AUTH_EMAIL"
 )
 
