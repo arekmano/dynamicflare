@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// CloudflareClient is the client used to interact with cloudflare
 type CloudflareClient struct {
 	logger *logrus.Entry
 	Client *http.Client
@@ -38,6 +39,7 @@ type listDomainsResponse struct {
 	Messages []map[string]interface{} `json:"messages"`
 }
 
+// Domain represents a domain
 type Domain struct {
 	ID     string `json:"id"`
 	Name   string `json:"name"`
@@ -59,6 +61,7 @@ type CloudflareConfig struct {
 	Email string
 }
 
+// NewCloudflareClient creates a new client based on given config
 func NewCloudflareClient(config *CloudflareConfig) *CloudflareClient {
 	return &CloudflareClient{
 		Email:  config.Email,
@@ -68,6 +71,7 @@ func NewCloudflareClient(config *CloudflareConfig) *CloudflareClient {
 	}
 }
 
+// UpdateMany updates all given records to point to the new IP
 func (c *CloudflareClient) UpdateMany(records []Record, newIP string) error {
 	for _, record := range records {
 		c.logger.
@@ -149,6 +153,7 @@ func (c *CloudflareClient) send(verb, url string, body []byte) ([]byte, error) {
 	return responseBody, nil
 }
 
+// Update updates the record to the new IP
 func (c *CloudflareClient) Update(record Record, newIP string) error {
 	record.Content = newIP
 	bodyBytes, err := json.Marshal(record)

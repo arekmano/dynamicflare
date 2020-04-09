@@ -9,11 +9,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// IfConfigClient is the client used to fetch your public IP from ifconfig.co
 type IfConfigClient struct {
 	logger *logrus.Entry
 	Client *http.Client
 }
 
+// NewIfConfigClient creates a new client.
 func NewIfConfigClient() *IfConfigClient {
 	return &IfConfigClient{
 		Client: http.DefaultClient,
@@ -21,6 +23,7 @@ func NewIfConfigClient() *IfConfigClient {
 	}
 }
 
+// GetPublicIP returns the public IP
 func (c *IfConfigClient) GetPublicIP() (newIP string, err error) {
 	c.logger.Debug("Fetching Public IP")
 	resp, err := c.Client.Get("https://ifconfig.co/ip")

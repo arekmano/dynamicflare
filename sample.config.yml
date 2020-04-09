@@ -1,0 +1,13 @@
+cloudflare:
+  key: ABC123ABC123ABC123
+  email: mail@example.com
+records:
+- id: ABC123ABC123ABC123
+  type: A
+  zoneid: ABC123ABC123ABC123
+  name: domain2.example.com
+- id: ABC123ABC123ABC123
+  type: A
+  zoneid: ABC123ABC123ABC123
+  name: domain.example.com
+cachefilename: .cached-ip

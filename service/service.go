@@ -16,6 +16,7 @@ type DynamicFlare struct {
 	filecache  *cache.FileCache
 }
 
+// Config the configuration used to create the service.
 type Config struct {
 	Cloudflare    *dns.CloudflareConfig
 	CacheFileName string
@@ -32,6 +33,7 @@ func New(config *Config) *DynamicFlare {
 	}
 }
 
+// ListDomains lists all the domains associated with the account
 func (s *DynamicFlare) ListDomains() error {
 	zones, err := s.cloudflare.Zones()
 	if err != nil {
@@ -48,6 +50,7 @@ func (s *DynamicFlare) ListDomains() error {
 	return nil
 }
 
+// ListDomainRecords lists all the records associated with the account
 func (s *DynamicFlare) ListDomainRecords() error {
 	zones, err := s.cloudflare.Zones()
 	if err != nil {
