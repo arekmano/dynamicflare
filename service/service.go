@@ -18,7 +18,7 @@ type DynamicFlare struct {
 
 // Config the configuration used to create the service.
 type Config struct {
-	Cloudflare    *dns.CloudflareConfig
+	Cloudflare    dns.CloudflareConfig
 	CacheFileName string
 	Records       []dns.Record
 }

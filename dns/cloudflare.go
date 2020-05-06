@@ -62,7 +62,7 @@ type CloudflareConfig struct {
 }
 
 // NewCloudflareClient creates a new client based on given config
-func NewCloudflareClient(config *CloudflareConfig) *CloudflareClient {
+func NewCloudflareClient(config CloudflareConfig) *CloudflareClient {
 	return &CloudflareClient{
 		Email:  config.Email,
 		Key:    config.Key,
