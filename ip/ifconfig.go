@@ -26,7 +26,7 @@ func NewIfConfigClient() *IfConfigClient {
 // GetPublicIP returns the public IP
 func (c *IfConfigClient) GetPublicIP() (newIP string, err error) {
 	c.logger.Debug("Fetching Public IP")
-	resp, err := c.Client.Get("https://ifconfig.co/ip")
+	resp, err := c.Client.Get("https://ifconfig.me")
 	if err != nil {
 		return "", err
 	}
