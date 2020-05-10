@@ -91,7 +91,9 @@ func (s *DynamicFlare) Run(dryRun bool, records []dns.Record) error {
 	}
 	ip, err := s.filecache.Read()
 	if err != nil {
-		return err
+		s.logger.
+			WithField("cache", s.filecache).
+			Warn("could not read old IP from cache")
 	}
 
 	entry := s.logger.
