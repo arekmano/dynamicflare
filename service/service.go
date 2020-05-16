@@ -83,8 +83,8 @@ func (s *DynamicFlare) listDomainRecords(id string) error {
 	return nil
 }
 
-// Run run the service
-func (s *DynamicFlare) Run(dryRun bool, records []dns.Record) error {
+// Update updates the public IP of the given records
+func (s *DynamicFlare) Update(dryRun bool, records []dns.Record) error {
 	newIP, err := s.ifconfig.GetPublicIP()
 	if err != nil {
 		return err
@@ -104,7 +104,11 @@ func (s *DynamicFlare) Run(dryRun bool, records []dns.Record) error {
 		return nil
 	} else if ip != newIP {
 		entry.Info("IP is different from cached. Updating Records")
-		return s.cloudflare.UpdateMany(records, newIP)
+		err = s.cloudflare.UpdateMany(records, newIP)
+		if err != nil {
+			return err
+		}
+		return s.filecache.Write(newIP)
 	}
 	entry.Info("IP is the same as the cached one")
 	return nil

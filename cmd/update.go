@@ -21,6 +21,6 @@ var updateCmd = &cobra.Command{
 		config := setup(verbose, configFile)
 		return service.
 			New(config).
-			Run(isDryRun, config.Records)
+			Update(isDryRun, config.Records)
 	},
 }
