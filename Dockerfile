@@ -1,3 +1,9 @@
+FROM golang AS BUILD
+
+WORKDIR /app
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build
+
 FROM alpine:latest
 
 RUN apk add --update --no-cache \
@@ -6,6 +12,6 @@ RUN apk add --update --no-cache \
     openssh-client \
     bash
 
-COPY ./dynamicflare /usr/bin/dynamicflare
+COPY --from=BUILD /app/dynamicflare /usr/bin/dynamicflare
 
 CMD [ "/usr/bin/dynamicflare" ]
