@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/arekmano/dynamicflare/cache"
 	"github.com/arekmano/dynamicflare/dns"
 	"github.com/arekmano/dynamicflare/ip"
@@ -111,5 +113,32 @@ func (s *DynamicFlare) Update(dryRun bool, records []dns.Record) error {
 		return s.filecache.Write(newIP)
 	}
 	entry.Info("IP is the same as the cached one")
+	return nil
+}
+
+func (c *Config) Validate() error {
+	if c.Cloudflare.Email == "" {
+		return errors.New("configuration validation error: email not specified")
+	}
+	if c.Cloudflare.Key == "" {
+		return errors.New("configuration validation error: cloudflare key not specified")
+	}
+	if c.CacheFileName == "" {
+		return errors.New("configuration validation error: cache file name not specified")
+	}
+	for _, record := range c.Records {
+		if record.ID == "" {
+			return errors.New("configuration validation error: record ID not specified")
+		}
+		if record.Name == "" {
+			return errors.New("configuration validation error: record name not specified")
+		}
+		if record.ZoneID == "" {
+			return errors.New("configuration validation error: record zone ID not specified")
+		}
+		if record.Type == "" {
+			return errors.New("configuration validation error: record type not specified")
+		}
+	}
 	return nil
 }
