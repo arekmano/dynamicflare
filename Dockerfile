@@ -2,7 +2,6 @@ FROM golang AS BUILD
 
 WORKDIR /app
 COPY . .
-RUN go test -v ./...
 RUN CGO_ENABLED=0 GOOS=linux go build
 
 FROM alpine:latest
