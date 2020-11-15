@@ -27,10 +27,13 @@ type Config struct {
 
 // New create a new DynamicFlare
 func New(config *Config) *DynamicFlare {
+	logger := logrus.New()
+	logger.SetLevel(logrus.DebugLevel)
+
 	return &DynamicFlare{
 		cloudflare: dns.NewCloudflareClient(config.Cloudflare),
 		ifconfig:   ip.NewIfConfigClient(),
-		logger:     logrus.WithField("component", "DynamicFlare"),
+		logger:     logger.WithField("component", "DynamicFlare"),
 		filecache:  cache.NewFileCache(config.CacheFileName),
 	}
 }
