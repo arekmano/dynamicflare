@@ -3,14 +3,16 @@ package ip_test
 import (
 	"net"
 	"testing"
+	"time"
 
 	"github.com/arekmano/dynamicflare/ip"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
 func TestGetPublicIP(t *testing.T) {
 	// Test data
-	client := ip.NewIfConfigClient()
+	client := ip.NewIfConfigClient(logrus.WithTime(time.Now()))
 
 	// Execute
 	result, err := client.GetPublicIP()

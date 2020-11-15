@@ -15,9 +15,9 @@ type FileCache struct {
 }
 
 // NewFileCache create a new file cache
-func NewFileCache(filePath string) *FileCache {
+func NewFileCache(filePath string, logger *logrus.Entry) *FileCache {
 	return &FileCache{
-		logger: logrus.
+		logger: logger.
 			WithField("file", filePath).
 			WithField("component", "FileCache"),
 		cacheFile: filePath,

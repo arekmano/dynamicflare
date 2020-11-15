@@ -16,10 +16,10 @@ type IfConfigClient struct {
 }
 
 // NewIfConfigClient creates a new client.
-func NewIfConfigClient() *IfConfigClient {
+func NewIfConfigClient(logger *logrus.Entry) *IfConfigClient {
 	return &IfConfigClient{
 		Client: http.DefaultClient,
-		logger: logrus.WithField("component", "IfConfigClient"),
+		logger: logger.WithField("component", "IfConfigClient"),
 	}
 }
 

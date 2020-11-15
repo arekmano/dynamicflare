@@ -12,10 +12,10 @@ import (
 
 // DynamicFlare main service
 type DynamicFlare struct {
-	logger     *logrus.Entry
-	cloudflare *dns.CloudflareClient
-	ifconfig   *ip.IfConfigClient
-	filecache  *cache.FileCache
+	logger          *logrus.Entry
+	DNSRecordClient *dns.CloudflareClient
+	IPClient        *ip.IfConfigClient
+	IPCache         *cache.FileCache
 }
 
 // Config the configuration used to create the service.
@@ -31,16 +31,16 @@ func New(config *Config) *DynamicFlare {
 	logger.SetLevel(logrus.DebugLevel)
 
 	return &DynamicFlare{
-		cloudflare: dns.NewCloudflareClient(config.Cloudflare),
-		ifconfig:   ip.NewIfConfigClient(),
-		logger:     logger.WithField("component", "DynamicFlare"),
-		filecache:  cache.NewFileCache(config.CacheFileName),
+		DNSRecordClient: dns.NewCloudflareClient(config.Cloudflare, logrus.NewEntry(logger)),
+		IPClient:        ip.NewIfConfigClient(logrus.NewEntry(logger)),
+		logger:          logger.WithField("component", "DynamicFlare"),
+		IPCache:         cache.NewFileCache(config.CacheFileName, logrus.NewEntry(logger)),
 	}
 }
 
 // ListDomains lists all the domains associated with the account
 func (s *DynamicFlare) ListDomains() error {
-	zones, err := s.cloudflare.Zones()
+	zones, err := s.DNSRecordClient.Zones()
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (s *DynamicFlare) ListDomains() error {
 
 // ListDomainRecords lists all the records associated with the account
 func (s *DynamicFlare) ListDomainRecords() error {
-	zones, err := s.cloudflare.Zones()
+	zones, err := s.DNSRecordClient.Zones()
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (s *DynamicFlare) ListDomainRecords() error {
 }
 
 func (s *DynamicFlare) listDomainRecords(id string) error {
-	records, err := s.cloudflare.Records(id)
+	records, err := s.DNSRecordClient.Records(id)
 	if err != nil {
 		return err
 	}
@@ -90,14 +90,14 @@ func (s *DynamicFlare) listDomainRecords(id string) error {
 
 // Update updates the public IP of the given records
 func (s *DynamicFlare) Update(dryRun bool, records []dns.Record) error {
-	newIP, err := s.ifconfig.GetPublicIP()
+	newIP, err := s.IPClient.GetPublicIP()
 	if err != nil {
 		return err
 	}
-	ip, err := s.filecache.Read()
+	ip, err := s.IPCache.Read()
 	if err != nil {
 		s.logger.
-			WithField("cache", s.filecache).
+			WithField("cache", s.IPCache).
 			Warn("could not read old IP from cache")
 	}
 
@@ -109,11 +109,11 @@ func (s *DynamicFlare) Update(dryRun bool, records []dns.Record) error {
 		return nil
 	} else if ip != newIP {
 		entry.Info("IP is different from cached. Updating Records")
-		err = s.cloudflare.UpdateMany(records, newIP)
+		err = s.DNSRecordClient.UpdateMany(records, newIP)
 		if err != nil {
 			return err
 		}
-		return s.filecache.Write(newIP)
+		return s.IPCache.Write(newIP)
 	}
 	entry.Info("IP is the same as the cached one")
 	return nil

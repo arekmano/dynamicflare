@@ -62,12 +62,12 @@ type CloudflareConfig struct {
 }
 
 // NewCloudflareClient creates a new client based on given config
-func NewCloudflareClient(config CloudflareConfig) *CloudflareClient {
+func NewCloudflareClient(config CloudflareConfig, logger *logrus.Entry) *CloudflareClient {
 	return &CloudflareClient{
 		Email:  config.Email,
 		Key:    config.Key,
 		Client: http.DefaultClient,
-		logger: logrus.WithField("component", "CloudflareClient"),
+		logger: logger.WithField("component", "CloudflareClient"),
 	}
 }
 
