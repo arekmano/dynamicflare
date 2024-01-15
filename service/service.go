@@ -97,7 +97,6 @@ func (s *DynamicFlare) Update(dryRun bool, records []dns.Record) error {
 	cacheContents, err := s.IPCache.Read()
 	if err != nil {
 		s.logger.
-			WithField("cache", s.IPCache).
 			Warn("could not read old IP from cache")
 	}
 
