@@ -103,6 +103,7 @@ func (s *DynamicFlare) Update(dryRun bool, records []dns.Record) error {
 
 	entry := s.logger.
 		WithField("old-ip", cacheContents.IpAddress).
+		WithField("cached-since", cacheContents.CacheTime.String()).
 		WithField("new-ip", newIP)
 	if cacheContents.IpAddress != newIP && dryRun {
 		entry.Info("IP is different from cached. Not updating (dry-run on)")
