@@ -1,6 +1,7 @@
 package cache_test
 
 import (
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -27,7 +28,8 @@ func TestCache(t *testing.T) {
 
 	// Verify
 	require.NoError(t, err)
-	require.Equal(t, result, value)
+	require.Equal(t, value, result.IpAddress)
+	fmt.Println(result)
 
 	// Cleanup
 	require.NoError(t, os.Remove(filePath))

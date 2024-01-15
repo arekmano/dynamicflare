@@ -18,9 +18,9 @@ var updateCmd = &cobra.Command{
 	Short: "used to update cloudflare dynamically",
 	Long:  "used to update cloudflare dynamically",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		config := setup(verbose, configFile)
+		config, logLevel := setup(verbose, configFile)
 		return service.
-			New(config).
+			New(config, logLevel).
 			Update(isDryRun, config.Records)
 	},
 }

@@ -26,9 +26,9 @@ type Config struct {
 }
 
 // New create a new DynamicFlare
-func New(config *Config) *DynamicFlare {
+func New(config *Config, level logrus.Level) *DynamicFlare {
 	logger := logrus.New()
-	logger.SetLevel(logrus.DebugLevel)
+	logger.SetLevel(level)
 
 	return &DynamicFlare{
 		DNSRecordClient: dns.NewCloudflareClient(config.Cloudflare, logrus.NewEntry(logger)),
@@ -94,7 +94,7 @@ func (s *DynamicFlare) Update(dryRun bool, records []dns.Record) error {
 	if err != nil {
 		return err
 	}
-	ip, err := s.IPCache.Read()
+	cacheContents, err := s.IPCache.Read()
 	if err != nil {
 		s.logger.
 			WithField("cache", s.IPCache).
@@ -102,12 +102,12 @@ func (s *DynamicFlare) Update(dryRun bool, records []dns.Record) error {
 	}
 
 	entry := s.logger.
-		WithField("old-ip", ip).
+		WithField("old-ip", cacheContents.IpAddress).
 		WithField("new-ip", newIP)
-	if ip != newIP && dryRun {
+	if cacheContents.IpAddress != newIP && dryRun {
 		entry.Info("IP is different from cached. Not updating (dry-run on)")
 		return nil
-	} else if ip != newIP {
+	} else if cacheContents.IpAddress != newIP {
 		entry.Info("IP is different from cached. Updating Records")
 		err = s.DNSRecordClient.UpdateMany(records, newIP)
 		if err != nil {

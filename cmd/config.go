@@ -16,17 +16,20 @@ const (
 	AuthEmailVariableName = "DYNAMICFLARE_AUTH_EMAIL"
 )
 
-func setup(verbose bool, configFile string) *service.Config {
+func setup(verbose bool, configFile string) (*service.Config, logrus.Level) {
 	if err := validate(); err != nil {
 		panic(err)
 	}
+	var logLevel logrus.Level
 	if verbose {
-		logrus.SetLevel(logrus.DebugLevel)
+		logLevel = logrus.DebugLevel
+	} else {
+		logLevel = logrus.InfoLevel
 	}
 	config := loadConfig(configFile)
 	logrus.
 		Debugf("loaded configuration file: %+v", config)
-	return config
+	return config, logLevel
 }
 
 func loadConfig(configFile string) *service.Config {
