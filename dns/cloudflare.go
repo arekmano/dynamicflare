@@ -3,7 +3,7 @@ package dns
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -141,7 +141,7 @@ func (c *CloudflareClient) send(verb, url string, body []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	responseBody, err := ioutil.ReadAll(resp.Body)
+	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

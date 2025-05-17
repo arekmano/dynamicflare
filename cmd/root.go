@@ -36,14 +36,14 @@ func Execute() {
 
 func validate() error {
 	if configFile == "" {
-		return errors.New("Must specify the config file")
+		return errors.New("must specify the config file")
 	}
 	stat, err := os.Stat(configFile)
 	if err != nil {
 		return err
 	}
 	if stat.IsDir() {
-		return errors.New("Specified a directory. Must specify a file")
+		return errors.New("specified a directory. must specify a file")
 	}
 	return nil
 }

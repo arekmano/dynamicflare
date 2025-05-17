@@ -18,12 +18,14 @@ func TestGetPublicIP(t *testing.T) {
 	result, err := client.GetPublicIP()
 	require.NoError(t, err)
 	resultIP := net.ParseIP(result)
+	require.NotNil(t, resultIP)
 	require.NoError(t, err)
 
 	// Execute
 	result, err = client.GetPublicIP()
 	require.NoError(t, err)
 	resultIP2 := net.ParseIP(result)
+	require.NotNil(t, resultIP2)
 	require.NoError(t, err)
 
 	// Verify

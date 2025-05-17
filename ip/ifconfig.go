@@ -2,7 +2,7 @@ package ip
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -26,14 +26,14 @@ func NewIfConfigClient(logger *logrus.Entry) *IfConfigClient {
 // GetPublicIP returns the public IP
 func (c *IfConfigClient) GetPublicIP() (newIP string, err error) {
 	c.logger.Debug("Fetching Public IP")
-	resp, err := c.Client.Get("https://ifconfig.me")
+	resp, err := c.Client.Get("https://ifconfig.me/ip")
 	if err != nil {
 		return "", err
 	}
 	if resp.StatusCode != 200 {
-		return "", errors.New("Error Fetching Public IP")
+		return "", errors.New("error fetching public ip")
 	}
-	ipBytes, err := ioutil.ReadAll(resp.Body)
+	ipBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}

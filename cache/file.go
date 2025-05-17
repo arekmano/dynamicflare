@@ -2,7 +2,7 @@ package cache
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -45,7 +45,7 @@ func (f *FileCache) Read() (cacheContents *CacheContents, err error) {
 		f.logger.Error("Error opening file")
 		return nil, err
 	}
-	fileBytes, err := ioutil.ReadAll(file)
+	fileBytes, err := io.ReadAll(file)
 	if err != nil {
 		f.logger.Error("Error reading from file")
 		return nil, err
@@ -71,6 +71,10 @@ func (f *FileCache) Write(newIP string) (err error) {
 		CacheTime: time.Now(),
 	}
 	jsonBytes, err := json.MarshalIndent(contents, "", " ")
+	if err != nil {
+		f.logger.Error("Error marshalling JSON!")
+		return err
+	}
 	_, err = file.Write(jsonBytes)
 	if err != nil {
 		f.logger.Error("Error writing to cache file!")
